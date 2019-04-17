@@ -1,21 +1,21 @@
-extends main
+extends layout
 
-block body
-    div#login.container
+block content
+    .main.container
         div: form(method='post', class='form-vertical')
             fieldset
                 legend: strong.text-info Login page
 
-                if message.error
+                if errors
                     div.alert.alert-danger Missing username or password
 
                 else
-                    if message.success
+                    if success
                         div.alert.alert-success You are now connected
 
                 div.form-group
                     label Username:
-                    input.form-control(name='username', value=user.username, autofocus)
+                    input.form-control(name='email', value=username, autofocus)
 
                 div.form-group
                     label Password:

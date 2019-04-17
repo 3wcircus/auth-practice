@@ -6,6 +6,7 @@ const passport = require('passport');
 const User = require('../models/User');
 const {forwardAuthenticated} = require('../config/auth');
 
+var LocalStrategy = require('passport-local').Strategy;
 
 /*
     Extend the base User routes and add our own
@@ -21,27 +22,29 @@ router.get('/register', forwardAuthenticated, (req, res) => res.render('register
 // Register a User. Make them enter the password twice for confirmation
 router.post('/register', (req, res) => {
     console.log('Posted this');
+    console.log(req.body);
 
     const {name, email, password, password2} = req.body;
     let errors = [];
 
     // Make sure they provided all fields
     if (!name || !email || !password || !password2) {
-        errors.push({msg: 'Please enter all of the required Info'});
+        errors.push('Please enter all of the required Info');
     }
     // Make sure they entered same password
     if (password !== password2) {
-        errors.push({msg: `Passwords Do NOT Match!`});
+        errors.push(`Passwords Do NOT Match!`);
     }
 
-    // ForCe at least 8 chars in pw
+    // Force at least 8 chars in pw
 
     if (password.length < MIN_PWD_LENGTH) {
-        errors.push({msg: `Password must be at least ${MIN_PWD_LENGTH}characters`});
+        errors.push(`Password must be at least ${MIN_PWD_LENGTH} characters`);
     }
 
     // Check for any errors
     if (errors.length > 0) {
+        console.log(`Got some errors: ${errors}`);
         res.render('register', {
             errors,
             name,
@@ -51,8 +54,9 @@ router.post('/register', (req, res) => {
         });
     } else {
         User.findOne({email: email}).then(user => { // Make sure not already registered
+            console.log(`Checking for existing user ${email}`);
             if (user) {
-                errors.push({msg: 'Email already exists'});
+                errors.push('Email already exists');
                 res.render('register', {
                     errors,
                     name,
